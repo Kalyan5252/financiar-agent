@@ -1,3 +1,25 @@
+# AI Finance Agent (stub)
+
+This repository contains a scaffold for an AI-powered personal finance agent built with Next.js App Router. The structure is a minimal starting point with API route stubs, components, Prisma schema, and basic helpers.
+
+Structure:
+
+- `app/` — Next.js app routes and pages
+- `components/` — UI components and chart stubs
+- `lib/` — helper utilities (prisma, auth, agent, analytics)
+- `prisma/` — Prisma schema
+- `styles/` — global CSS
+
+Quick start (macOS):
+
+```bash
+cd "$(dirname \"$0\")"
+npm install
+npx prisma generate
+npm run dev
+```
+
+Fill `.env` with `DATABASE_URL` and any API keys required.
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
