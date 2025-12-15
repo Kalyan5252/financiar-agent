@@ -2,14 +2,14 @@
 
 import { PieChart, Pie, Cell } from 'recharts';
 
-const data = [
-  { name: 'Food & Drink', value: 48, color: '#34d399' },
-  { name: 'Grocery', value: 32, color: '#a78bfa' },
-  { name: 'Shopping', value: 13, color: '#f472b6' },
-  { name: 'Transport', value: 7, color: '#facc15' },
-];
+// const data = [
+//   { name: 'Food & Drink', value: 48, color: '#34d399' },
+//   { name: 'Grocery', value: 32, color: '#a78bfa' },
+//   { name: 'Shopping', value: 13, color: '#f472b6' },
+//   { name: 'Transport', value: 7, color: '#facc15' },
+// ];
 
-export default function SummaryPie() {
+export default function SummaryPie({ data }: { data: any[] }) {
   return (
     <>
       <h2 className="text-lg font-semibold mb-4">Summary</h2>

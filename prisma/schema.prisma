@@ -43,19 +43,39 @@ model Statement {
   user User @relation(fields: [userId], references: [id])
 }
 
-
 model Transaction {
-  id          String   @id @default(uuid())
-  userId      String
-  categoryId  String?
-  amount      Float
-  date        DateTime
-  paymentMode PaymentMode
-  merchant    String?
-  description String?
+  id              String   @id @default(uuid())
+  userId          String
+  amount          Float
+  direction       TransactionDirection
+  currency        String   @default("INR")
+  transactionDate DateTime
+  createdAt       DateTime @default(now())
+  paymentMode     PaymentMode
+  merchant        String?
+  description     String?
+  provider        TransactionProvider
+  providerTxnId   String?   // PhonePe Transaction ID
+  utr             String?
+  categoryId      String?
+  user            User      @relation(fields: [userId], references: [id])
+  category        Category? @relation(fields: [categoryId], references: [id])
 
-  user     User     @relation(fields: [userId], references: [id])
-  category Category?@relation(fields: [categoryId], references: [id])
+  @@unique([provider, providerTxnId])
+}
+
+
+enum TransactionDirection {
+  INCOME
+  EXPENSE
+}
+
+enum TransactionProvider {
+  PHONEPE
+  GPAY
+  PAYTM
+  BANK
+  MANUAL
 }
 
 enum PaymentMode {

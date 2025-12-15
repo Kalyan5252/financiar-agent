@@ -1,16 +1,35 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import RevenueChart from '@/components/dashboard/RevenueChart';
 import DailyExpensesChart from '@/components/dashboard/DailyExpensesChart';
 import SummaryPie from '@/components/dashboard/SummaryPie';
 import TransactionsTable from '@/components/dashboard/TransactionsTable';
 import { useSession } from 'next-auth/react';
+import { useScrollGradient } from '@/app/hooks/useScrollGradient';
 
 export default function DashboardPage() {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const session = useSession();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { data: userData } = useSession();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scrolled = useScrollGradient(scrollRef, Boolean(data));
+
+  useEffect(() => {
+    fetch('/api/dashboard')
+      .then((res) => res.json())
+      .then(setData);
+  }, []);
+
+  useEffect(() => {
+    console.log('Dashboard data:', data);
+  }, [data]);
+
+  if (!data) {
+    return <div className="text-white p-8">Loading dashboard...</div>;
+  }
 
   const handleUpload = async (file: File) => {
     setLoading(true);
@@ -36,7 +55,6 @@ export default function DashboardPage() {
         throw new Error('Failed to extract PDF text');
       }
 
-      // 2️⃣ Store extracted text in your backend
       await fetch('/api/statements', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -55,13 +73,16 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0b0b] text-white p-8">
-      {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
+    <div className="min-h-screen max-h-screen overflow-scroll lg:overflow-clip bg-[#0b0b0b] text-white p-8">
+      <div
+        className={`mb-6 flex items-center justify-between end-gradient ${
+          scrolled ? 'scrolled' : ''
+        } overflow-visible`}
+      >
         <div>
           <h1 className="text-3xl font-semibold">Dashboard</h1>
           <p className="text-gray-400">
-            Hi Jonathan, here are your financial stats
+            Hi {userData?.user.name}, here are your financial stats
           </p>
         </div>
 
@@ -85,23 +106,23 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Top grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <div className="bg-[#161616] rounded-2xl p-6">
-          <RevenueChart />
-        </div>
-        <div className="bg-[#161616] rounded-2xl p-6">
-          <DailyExpensesChart />
-        </div>
-        <div className="bg-[#161616] rounded-2xl p-6">
-          <SummaryPie />
-        </div>
-      </div>
+      <div ref={scrollRef} className="h-[80vh] overflow-scroll">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div className="bg-[#161616] rounded-2xl p-6">
+            <RevenueChart data={data.revenue} />
+          </div>
 
-      {/* Bottom grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-3 bg-[#161616] rounded-2xl p-6">
-          <TransactionsTable />
+          <div className="bg-[#161616] rounded-2xl p-6">
+            <DailyExpensesChart data={data.dailyExpenses} />
+          </div>
+
+          <div className="bg-[#161616] rounded-2xl p-6">
+            <SummaryPie data={data.categorySummary} />
+          </div>
+        </div>
+
+        <div className="bg-[#161616] rounded-2xl p-6">
+          <TransactionsTable data={data.transactions} />
         </div>
       </div>
     </div>

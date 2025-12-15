@@ -9,23 +9,50 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-const data = [
-  { day: '1', income: 400, expense: 300 },
-  { day: '2', income: 600, expense: 500 },
-  { day: '3', income: 300, expense: 200 },
-  { day: '4', income: 700, expense: 600 },
-  { day: '5', income: 500, expense: 400 },
-  { day: '6', income: 650, expense: 550 },
-];
+function normalizeRevenueData(raw: any[]) {
+  const map = new Map<
+    string,
+    { day: string; income: number; expense: number }
+  >();
 
-export default function RevenueChart() {
+  for (const item of raw) {
+    const day = item.date;
+
+    if (!map.has(day)) {
+      map.set(day, { day, income: 0, expense: 0 });
+    }
+
+    const entry = map.get(day)!;
+
+    if (item.type === 'income') {
+      entry.income = item.amount;
+    } else {
+      entry.expense = item.amount;
+    }
+  }
+
+  return Array.from(map.values());
+}
+
+export default function RevenueChart({ data }: { data: any[] }) {
+  const chartData = normalizeRevenueData(data);
+
+  if (!chartData.length) {
+    return (
+      <div>
+        <h2 className="text-lg font-semibold mb-1">Revenue</h2>
+        <p className="text-sm text-gray-400">No data available</p>
+      </div>
+    );
+  }
+
   return (
     <>
       <h2 className="text-lg font-semibold mb-1">Revenue</h2>
-      <p className="text-sm text-gray-400 mb-4">Data from 1–12 Apr, 2024</p>
+      <p className="text-sm text-gray-400 mb-4">Income vs Expense over time</p>
 
       <ResponsiveContainer width="100%" height={200}>
-        <LineChart data={data}>
+        <LineChart data={chartData}>
           <XAxis dataKey="day" stroke="#555" />
           <YAxis stroke="#555" />
           <Tooltip />

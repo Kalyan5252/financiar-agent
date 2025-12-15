@@ -1,7 +1,9 @@
 type ParsedTransaction = {
   date: Date;
   amount: number;
-  paymentMode: 'UPI' | 'CARD' | 'BANK' | 'CASH';
+  direction: 'INCOME' | 'EXPENSE';
   merchant: string;
   description: string;
+  providerTxnId: string;
+  utr?: string;
 };
