@@ -7,6 +7,7 @@ import SummaryPie from '@/components/dashboard/SummaryPie';
 import TransactionsTable from '@/components/dashboard/TransactionsTable';
 import { useSession } from 'next-auth/react';
 import { useScrollGradient } from '@/app/hooks/useScrollGradient';
+import LogoutButton from '@/components/dashboard/Logout';
 
 export default function DashboardPage() {
   const [data, setData] = useState<any>(null);
@@ -103,6 +104,8 @@ export default function DashboardPage() {
           >
             {loading ? 'Uploading…' : 'Upload Statement'}
           </button>
+
+          <LogoutButton />
         </div>
       </div>
 

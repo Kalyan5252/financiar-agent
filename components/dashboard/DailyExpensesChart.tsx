@@ -19,10 +19,35 @@ import {
 // ];
 
 export default function DailyExpensesChart({ data }: { data: any[] }) {
+  if (!data || data.length === 0) {
+    return (
+      <>
+        <h2 className="text-lg font-semibold mb-1">Daily Expenses</h2>
+        <p className="text-sm text-gray-400">No expense data available</p>
+      </>
+    );
+  }
+
+  const sorted = [...data].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+
+  const startDate = new Date(sorted[0].day).toLocaleDateString('en-IN', {
+    day: 'numeric',
+    month: 'short',
+  });
+
+  const endDate = new Date(sorted[sorted.length - 1].day).toLocaleDateString(
+    'en-IN',
+    { day: 'numeric', month: 'short', year: '2-digit' }
+  );
+
   return (
     <>
       <h2 className="text-lg font-semibold mb-1">Daily Expenses</h2>
-      <p className="text-sm text-gray-400 mb-4">Data from 1–12 Apr, 2024</p>
+      <p className="text-sm text-gray-400 mb-4">
+        Data from {startDate} – {endDate}
+      </p>
 
       <ResponsiveContainer width="100%" height={200}>
         <BarChart data={data}>

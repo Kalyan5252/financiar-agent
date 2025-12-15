@@ -38,7 +38,7 @@ export default function TransactionsTable({ data }: { data: any[] }) {
                       r.type == 'Income' ? 'text-green-400' : 'text-red-400'
                     }`}
                   >
-                    {r.type == 'Income' ? '↘' : '↙'}
+                    {r.type == 'Income' ? '↘' : '↗'}
                   </span>
 
                   <span className="font-medium text-gray-200">
