@@ -1,4 +1,4 @@
-type ParsedTransaction = {
+export type ParsedTransaction = {
   date: Date;
   amount: number;
   direction: 'INCOME' | 'EXPENSE';

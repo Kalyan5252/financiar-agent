@@ -1,3 +1,5 @@
+import { ParsedTransaction } from './pdf-parser/types';
+
 export function parsePhonePeStatement(text: string): ParsedTransaction[] {
   const results: ParsedTransaction[] = [];
 
