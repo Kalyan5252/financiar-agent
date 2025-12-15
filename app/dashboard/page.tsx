@@ -116,8 +116,8 @@ export default function DashboardPage() {
             <DailyExpensesChart data={data.dailyExpenses} />
           </div>
 
-          <div className="bg-[#161616] rounded-2xl p-6">
-            <SummaryPie data={data.categorySummary} />
+          <div className="z-10 rounded-2xl h-full w-full flex justify-center">
+            <SummaryPie />
           </div>
         </div>
 

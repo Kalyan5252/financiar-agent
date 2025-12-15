@@ -1,37 +1,97 @@
 'use client';
 
-import { PieChart, Pie, Cell } from 'recharts';
+import { useEffect, useState } from 'react';
+import AIBackgroundCard from '../ai/AiBackgroundCard';
+import Background from '../ai/Background';
+import AnimatedSphere from '../ai/AnimatedSphere';
+import { useTypewriter } from '@/app/hooks/useTypewriter';
 
-// const data = [
-//   { name: 'Food & Drink', value: 48, color: '#34d399' },
-//   { name: 'Grocery', value: 32, color: '#a78bfa' },
-//   { name: 'Shopping', value: 13, color: '#f472b6' },
-//   { name: 'Transport', value: 7, color: '#facc15' },
-// ];
+export default function AISummary() {
+  // const [insights, setInsights] = useState<string[]>([]);
+  const [insights, setInsights] = useState<string[]>([
+    // 'Total income is relatively stable, indicating consistent earning potential. ',
+    // 'Net savings are positive but minimal, suggesting limited financial flexibility. ',
+    // 'Average daily expenses are high, indicating potential overspending on non-essential items. ',
+    // 'The highest single expense significantly impacts overall financial health and should be monitored. ',
+    // 'Thirteen small expenses suggest frequent minor spending, which can accumulate over time. ',
+    // 'Income days indicate a need for better cash flow management throughout the month. ',
+    // 'Expense spikes can destabilize monthly budgeting and require closer scrutiny. ',
+    // 'Maintaining savings above zero is positive but needs improvement for future security. ',
+    // 'Identifying patterns in spending could help reduce unnecessary expenses and increase savings. ',
+    // 'Overall financial health shows a tight budget, indicating potential risks during unexpected expenses.',
+  ]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [expanded, setExpanded] = useState(false);
+  const [phase, setPhase] = useState<'hello...' | 'insight'>('hello...');
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-export default function SummaryPie({ data }: { data: any[] }) {
+  const typedText = useTypewriter(
+    phase === 'hello...' ? 'HELLO...' : insights[currentIndex] ?? '',
+    40,
+    true
+  );
+
+  useEffect(() => {
+    const fetchSummary = async () => {
+      try {
+        const res = await fetch('/api/ai_analysis');
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Failed to load AI summary');
+        }
+
+        setInsights(data.insights || []);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSummary();
+  }, []);
+
+  useEffect(() => {
+    console.log('AI Insights:', insights);
+  }, [insights]);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setExpanded(true);
+      setPhase('insight');
+    }, 6000);
+
+    return () => clearTimeout(t);
+  }, []);
+
+  // 🔁 Rotate insights every 7s
+  useEffect(() => {
+    if (!expanded || insights.length === 0) {
+      setPhase('hello...');
+      return;
+    }
+    setPhase('insight');
+
+    const interval = setInterval(() => {
+      setCurrentIndex((i) => (i + 1) % insights.length);
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [expanded, insights]);
+
   return (
-    <>
-      <h2 className="text-lg font-semibold mb-4">Summary</h2>
-
-      <div className="flex items-center gap-6">
-        <PieChart width={180} height={180}>
-          <Pie data={data} dataKey="value" innerRadius={60} outerRadius={80}>
-            {data.map((d) => (
-              <Cell key={d.name} fill={d.color} />
-            ))}
-          </Pie>
-        </PieChart>
-
-        <div className="space-y-2 text-sm">
-          {data.map((d) => (
-            <div key={d.name} className="flex justify-between w-40">
-              <span className="text-gray-300">{d.name}</span>
-              <span>{d.value}%</span>
-            </div>
-          ))}
-        </div>
+    <Background expanded={expanded} setExpanded={setExpanded}>
+      <div className="z-10 px-10">
+        <h1
+          className={`font-bold ${
+            expanded ? 'text-xl' : 'text-2xl'
+          } text-[#E7E7E7] glow-text transition-all duration-500`}
+        >
+          {typedText}
+        </h1>
       </div>
-    </>
+    </Background>
   );
 }

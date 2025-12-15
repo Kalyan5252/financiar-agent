@@ -62,3 +62,26 @@ svg {
   bottom: -40px;
   height: 40px;
 }
+
+.aicard-border {
+  background: linear-gradient(
+    135deg,
+    #a6162c,
+    #a51364,
+    #aa20c6,
+    #4e13c6,
+    #1319c6,
+    rgb(19, 164, 198),
+    #13c686,
+    #5ac613,
+    #c6d213,
+    #c67f13,
+    #c64213,
+    #c61616
+  );
+}
+
+.glow-text {
+  text-shadow: 0 0 6px rgba(200, 200, 255, 0.35);
+  /* 0 0 12px rgba(255, 255, 255, 0.25); */
+}
