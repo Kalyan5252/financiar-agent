@@ -1,11 +1,13 @@
-import NextAuth from 'next-auth';
+import NextAuth, { type NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import type { JWT } from 'next-auth/jwt';
+import type { User, Account, Session } from 'next-auth';
 
-const handler = NextAuth({
-  secret: process.env.NEXTAUTH_SECRET, // ✅ REQUIRED
+export const authOptions: NextAuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
 
   session: {
     strategy: 'jwt',
@@ -59,7 +61,13 @@ const handler = NextAuth({
   },
 
   callbacks: {
-    async signIn({ user, account }) {
+    /**
+     * ------------------------
+     * signIn
+     * Ensure Google users exist in DB
+     * ------------------------
+     */
+    async signIn({ user, account }: { user: User; account: Account | null }) {
       if (account?.provider === 'google') {
         await prisma.user.upsert({
           where: { email: user.email! },
@@ -73,20 +81,37 @@ const handler = NextAuth({
       return true;
     },
 
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
+    async jwt({
+      token,
+      user,
+      account,
+    }: {
+      token: JWT;
+      user?: User;
+      account?: Account | null;
+    }) {
+      // On first login
+      if (user?.email) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: user.email },
+        });
+
+        if (dbUser) {
+          token.id = dbUser.id; // ✅ DB UUID
+        }
       }
+
       return token;
     },
 
-    async session({ session, token }) {
-      if (session.user) {
+    async session({ session, token }: { session: Session; token: JWT }) {
+      if (session.user && token.id) {
         session.user.id = token.id as string;
       }
       return session;
     },
   },
-});
+};
 
+const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };

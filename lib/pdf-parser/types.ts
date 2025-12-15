@@ -1,10 +1,7 @@
-export type ParsedTransaction = {
-  date: string; // YYYY-MM-DD
-  time?: string; // HH:MM AM/PM
-  description: string;
-  type: 'CREDIT' | 'DEBIT';
+type ParsedTransaction = {
+  date: Date;
   amount: number;
-  currency: 'INR';
-  transactionId?: string;
-  utr?: string;
+  paymentMode: 'UPI' | 'CARD' | 'BANK' | 'CASH';
+  merchant: string;
+  description: string;
 };
